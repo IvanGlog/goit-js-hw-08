@@ -1,59 +1,41 @@
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 // Add imports above this line
 import { galleryItems } from './gallery-items';
+// Change code below this line
 
-import SimpleLightbox from "simplelightbox";
-
-import "simplelightbox/dist/simple-lightbox.min.css";
+console.log(galleryItems);
 
 const refs = {
-  imageContainer: document.querySelector(".gallery"),
-  body: document.body,
+  galereyList: document.querySelector('.gallery'),
+  body: document.querySelector('body'),
 };
 
-const cardgalleryMarkup = makegalleryItems(galleryItems);
+refs.galereyList.insertAdjacentHTML(
+  'beforeend',
+  createImageCards(galleryItems)
+);
+refs.galereyList.addEventListener('click', onGaleryListClick);
 
-refs.imageContainer.insertAdjacentHTML("beforeend", cardgalleryMarkup);
-
-function makegalleryItems(items) {
-  return items
-    .map(({ preview, description, original }) => {
-      return `<li class="gallery__item"><a class="gallery__link" href="${original}">
-  <img loading="lazy" width="354" height="240" class="gallery__image" src="${preview}" alt="${description}" />
-</a></li>`;
+function createImageCards(galleryItems) {
+  return galleryItems
+    .map(({ original, preview, description }) => {
+      return `<div><a class="gallery__item" href="${original}">
+                <img class="gallery__image" src="${preview}" 
+                alt="${description}" />
+            </a></div>`;
     })
-    .join("");
+    .join('');
 }
-
-const lightbox = new SimpleLightbox(".gallery a", {
-  captionsData: "alt",
+const lightbox = new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
   captionDelay: 250,
   scrollZoom: false,
 });
-
-lightbox.on("shown.simplelightbox", function () {
-  refs.body.classList.add("disable-scroll");
-});
-lightbox.on("closed.simplelightbox", function () {
-  refs.body.classList.remove("disable-scroll");
-});
-
-
-const lazyImages = refs.imageContainer.querySelectorAll(".gallery__image");
-
-lazyImages.forEach((image) =>
-  image.addEventListener("load", onImageLoaded, { once: true })
-);
-
-function onImageLoaded(event) {
-  event.target.classList.add("appear");
+function onGaleryListClick(event) {
+  event.preventDefault();
+  if (!event.target.classList.contains('gallery__image')) {
+    return;
+  }
 }
-
-lazyImages.forEach((image) =>
-  image.addEventListener("mouseenter", onMouseEnter)
-);
-
-
-function onMouseEnter(event) {
-  event.target.style.transitionDelay = '100ms';
-  event.target.style.transitionDuration = "500ms";
-}
+console.dir(refs.body);

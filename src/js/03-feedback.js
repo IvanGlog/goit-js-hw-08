@@ -1,38 +1,42 @@
-const throttle = require("lodash.throttle");
-
+import { throttle } from 'lodash.throttle';
+const throttle = require('lodash.throttle');
 const refs = {
-  form: document.querySelector('.feedback-form'),
+  onInputData: document.querySelector('.feedback-form'),
 };
 
-const LOCALSTORAGE_KEY = 'feedback-form-state';
-
-refs.form.addEventListener('input',throttle(onInputForm,500));
-refs.form.addEventListener('submit', onSubmitForm);
+refs.onInputData.addEventListener('input', throttle(handleInputData, 500));
 window.addEventListener('load', updateOutputOnload);
+refs.onInputData.addEventListener('submit', onSubmit);
 
-function onInputForm(e) {
-  e.preventDefault();
-  const message = refs.form.elements.message.value;
-  const email = refs.form.elements.email.value;
-  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({ message, email }));
-  
+function handleInputData(event) {
+  event.preventDefault();
+  const message = refs.onInputData.elements.message.value;
+  const email = refs.onInputData.elements.email.value;
+  localStorage.setItem(
+    'feedback-form-state',
+    JSON.stringify({ message, email })
+  );
 }
 
-function updateOutputOnload(e) {
-  e.preventDefault();
-  const outputTextContent = localStorage.getItem(LOCALSTORAGE_KEY);
-  const outputObjectContent = JSON.parse(outputTextContent)||{email:"", message:""};
-  const { email, message } = outputObjectContent;
-  refs.form.elements.email.value = email;
-  refs.form.elements.message.value = message;
+function updateOutputOnload(event) {
+  event.preventDefault();
+  const OutputText = JSON.parse(
+    localStorage.getItem('feedback-form-state')
+  ) || {
+    email: '',
+    message: '',
+  };
+  const { email, message } = OutputText;
+  refs.onInputData.elements.email.value = email;
+  refs.onInputData.elements.message.value = message;
 }
 
-function onSubmitForm(e) {
-  e.preventDefault();
+function onSubmit(event) {
+  event.preventDefault();
   const {
     elements: { email, message },
-  } = e.currentTarget;
-  console.log({email:email.value, message:message.value})
-  localStorage.clear();
-  refs.form.reset();
+  } = event.currentTarget;
+  console.log({ email: email.value, message: message.value });
+  localStorage.removeItem('feedback-form-state');
+  refs.onInputData.reset();
 }
